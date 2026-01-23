@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>API Explorer - {{ tenant.name }}</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .token-box {
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .token-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .token-value {
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            word-break: break-all;
+        }
+
+        .action-area {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .response-container {
+            background: var(--code-bg);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            color: #e2e8f0;
+            min-height: 200px;
+            position: relative;
+            overflow: auto;
+        }
+
+        pre {
+            margin: 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-idle {
+            background: #94a3b8;
+        }
+
+        .status-loading {
+            background: #fbbf24;
+            animation: pulse 1s infinite;
+        }
+
+        .status-success {
+            background: #22c55e;
+        }
+
+        .status-error {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>API Token Demonstration</h1>
+            <p>This page simulates how an external frontend or client would call your organization's API using its
+                unique token.</p>
+
+            <div class="token-box">
+                <div class="token-label">Your Active API Token</div>
+                <div class="token-value" id="api-token">{{ api_token }}</div>
+            </div>
+
+            <div class="action-area">
+                <button id="btn-call-api">🚀 Call Secured API</button>
+                <div style="display: flex; align-items: center; font-size: 0.85rem; color: var(--text-muted);">
+                    <span id="status-dot" class="status-dot status-idle"></span>
+                    <span id="status-text">Ready</span>
+                </div>
+            </div>
+
+            <div class="response-container">
+                <pre id="response-output">// Click "Call Secured API" to see results...</pre>
+            </div>
+
+            <a href="{% url 'tenant_dashboard' %}" class="back-link">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        const btn = document.getElementById('btn-call-api');
+        const output = document.getElementById('response-output');
+        const dot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const token = document.getElementById('api-token').innerText;
+
+        btn.addEventListener('click', async () =>
+        {
+            // UI Update: Loading
+            btn.disabled = true;
+            dot.className = 'status-dot status-loading';
+            statusText.innerText = 'Requesting...';
+            output.innerText = '// Fetching data from /api-test/ using Bearer token...';
+
+            try
+            {
+                // REAL API CALL
+                const response = await fetch('/api-test/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                // UI Update: Success/Error
+                if (response.ok)
+                {
+                    dot.className = 'status-dot status-success';
+                    statusText.innerText = `Success (${response.status})`;
+                } else
+                {
+                    dot.className = 'status-dot status-error';
+                    statusText.innerText = `Failed (${response.status})`;
+                }
+
+                output.innerText = JSON.stringify(data, null, 4);
+
+            } catch (err)
+            {
+                dot.className = 'status-dot status-error';
+                statusText.innerText = 'Connection Error';
+                output.innerText = `Error connecting to API:\n${err.message}`;
+            } finally
+            {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

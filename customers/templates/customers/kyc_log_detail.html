@@ -1,0 +1,88 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}KYC Detail - #{{ log.id }}{% endblock %}
+
+{% block brand %}{{ tenant.legal_name }}{% endblock %}
+
+{% block nav_items %}
+<a href="{% url 'tenant_dashboard' %}">Overview</a>
+<a href="{% url 'kyc_log_list' %}" class="active">KYC Logs</a>
+<a href="#">Users</a>
+<a href="{% url 'api_demo' %}">API Keys</a>
+{% endblock %}
+
+{% block page_title %}KYC Record Detail{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'kyc_log_list' %}" style="text-decoration: none; color: #666;">← Back to Logs</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <div class="card">
+        <h2>Record Information</h2>
+        <table>
+            <tr>
+                <th width="150">Log ID</th>
+                <td><code>#{{ log.id }}</code></td>
+            </tr>
+            <tr>
+                <th>Customer</th>
+                <td><strong>{{ log.customer.name }}</strong></td>
+            </tr>
+            <tr>
+                <th>Document Type</th>
+                <td>{{ log.document_type }}</td>
+            </tr>
+            <tr>
+                <th>Created At</th>
+                <td>{{ log.created_at|date:"M d, Y H:i:s" }}</td>
+            </tr>
+            <tr>
+                <th>Organization context</th>
+                <td><code>{{ log.org_id }}</code></td>
+            </tr>
+            <tr>
+                <th>Notes</th>
+                <td>{{ log.notes|default:"No notes provided." }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>Document Preview</h2>
+        {% if log.document_image %}
+        <div
+            style="border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #f8f9fa; text-align: center;">
+            <img src="{{ log.document_image.url }}" alt="KYC Document" style="max-width: 100%; border-radius: 4px;">
+            <div style="margin-top: 10px; font-size: 0.8em; color: #666;">
+                Path: <code>{{ log.document_image.name }}</code>
+            </div>
+        </div>
+        {% else %}
+        <div
+            style="padding: 40px; text-align: center; background: #f8f9fa; border: 2px dashed #ddd; border-radius: 8px; color: #666;">
+            No image uploaded for this record.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+</style>
+{% endblock %}

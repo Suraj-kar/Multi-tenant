@@ -1,0 +1,44 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Confirm Deletion - Admin{% endblock %}
+
+{% block brand %}SaaS SuperAdmin{% endblock %}
+
+{% block nav_items %}
+<a href="{% url 'dashboard' %}">Tenants</a>
+<a href="{% url 'create_tenant' %}">+ New Tenant</a>
+{% endblock %}
+
+{% block page_title %}Security Verification: Tenant Deletion{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto; border-top: 5px solid #dc3545;">
+    <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 4rem; color: #dc3545; margin-bottom: 20px;">⚠️</div>
+        <h2 style="border: none; margin-bottom: 10px;">Permanent Action Required</h2>
+        <p style="color: #666; font-size: 1.1rem; line-height: 1.6;">
+            Are you absolutely sure you want to delete the organization
+            <strong style="color: #333;">"{{ client.name }}"</strong>?
+        </p>
+    </div>
+
+    <div style="background: #fdf2f2; border: 1px solid #f8d7da; border-radius: 8px; padding: 20px; margin: 20px 0;">
+        <h4 style="color: #a94442; margin-top: 0; margin-bottom: 10px;">What happens next?</h4>
+        <ul style="color: #a94442; margin: 0; padding-left: 20px; font-size: 0.95rem;">
+            <li>The database schema <strong>"{{ client.schema_name }}"</strong> will be dropped.</li>
+            <li>All <strong>PII, Media, and Logs</strong> will be permanently destroyed.</li>
+            <li>All <strong>API Keys</strong> and <strong>ISS IDs</strong> will be revoked.</li>
+            <li>This action <strong>cannot</strong> be undone.</li>
+        </ul>
+    </div>
+
+    <form method="post" style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+        {% csrf_token %}
+        <a href="{% url 'dashboard' %}" class="btn"
+            style="background: #f1f3f5; color: #495057; padding: 12px 30px; font-weight: 600;">Cancel and Keep</a>
+        <button type="submit" class="btn btn-delete"
+            style="padding: 12px 30px; font-weight: 600; background: #dc3545; color: white;">Yes, Destroy
+            Everything</button>
+    </form>
+</div>
+{% endblock %}

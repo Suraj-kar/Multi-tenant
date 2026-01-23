@@ -1,0 +1,72 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}SaaS Admin - Dashboard{% endblock %}
+
+{% block brand %}SaaS SuperAdmin{% endblock %}
+
+{% block nav_items %}
+<a href="{% url 'dashboard' %}" class="active">Tenants</a>
+<a href="{% url 'create_tenant' %}">+ New Tenant</a>
+<!-- Add more admin links here -->
+{% endblock %}
+
+{% block page_title %}Tenant Management{% endblock %}
+
+{% block user_info %}
+<span>{{ user.username }} (SuperUser)</span>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div
+        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+        <h2 style="margin:0; border:none;">All Tenants</h2>
+        <a href="{% url 'create_tenant' %}" class="btn btn-primary">Create Tenant</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Organization</th>
+                <th>Domain (Schema)</th>
+                <th>Status</th>
+                <th>Access</th>
+                <th style="text-align:right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tenant in tenants %}
+            <tr>
+                <td>
+                    <div style="font-weight:bold;">{{ tenant.name }}</div>
+                    <small style="color:#666;">{{ tenant.legal_name }}</small>
+                </td>
+                <td>
+                    <div><a href="http://{{ tenant.domains.first.domain }}:8000" target="_blank">{{
+                            tenant.domains.first.domain }}</a></div>
+                    <small style="color:#666;">{{ tenant.schema_name }}</small>
+                </td>
+                <td>
+                    <span class="badge badge-{{ tenant.status|lower }}">{{ tenant.get_status_display }}</span>
+                </td>
+                <td>{{ tenant.get_status_display }}</td>
+                <td style="text-align:right;">
+                    <a href="{% url 'update_tenant' tenant.pk %}" class="btn btn-sm btn-edit">Edit</a>
+                    <a href="{% url 'delete_tenant' tenant.pk %}" class="btn btn-sm btn-delete">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align:center; padding:20px;">No tenants found. Create one to get started.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>System Status</h2>
+    <p><strong>Total Tenants:</strong> {{ tenants.count }}</p>
+</div>
+{% endblock %}

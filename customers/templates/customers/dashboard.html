@@ -1,0 +1,91 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Dashboard - {{ tenant.name }}{% endblock %}
+
+{% block brand %}{{ tenant.legal_name }}{% endblock %}
+
+{% block nav_items %}
+<a href="{% url 'tenant_dashboard' %}" class="active">Overview</a>
+<a href="{% url 'kyc_log_list' %}">KYC Logs</a>
+<a href="{% url 'module_list' %}">AI Modules</a>
+<!-- Future features -->
+<a href="#">Users</a>
+<a href="#">Settings</a>
+<a href="#">API Keys</a>
+{% endblock %}
+
+{% block page_title %}Organization Overview{% endblock %}
+
+{% block user_info %}
+<span>{{ user.username }}</span>
+<span class="badge badge-{{ tenant.status|lower }}">{{ tenant.get_status_display }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Account Details</h2>
+    <table>
+        <tr>
+            <th width="200">Legal Name</th>
+            <td>{{ tenant.legal_name }}</td>
+        </tr>
+        <tr>
+            <th>Organization ID</th>
+            <td><code>{{ tenant.org_id }}</code></td>
+        </tr>
+        <tr>
+            <th>Issuer ID (iss)</th>
+            <td><code>{{ tenant.iss_id }}</code></td>
+        </tr>
+        <tr>
+            <th>Schema Name</th>
+            <td>{{ tenant.schema_name }}</td>
+        </tr>
+        <tr>
+            <th>Current Status</th>
+            <td><span class="badge badge-{{ tenant.status|lower }}">{{ tenant.get_status_display }}</span></td>
+        </tr>
+    </table>
+</div>
+
+<div style="margin-top: 30px; padding: 20px; background: #f0f7ff; border: 1px solid #cce3ff; border-radius: 8px;">
+    <h3 style="margin-top: 0;">API Integration</h3>
+    <p>Explore how to use your unique API token to integrate with external systems.</p>
+    <a href="{% url 'api_demo' %}"
+        style="display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+        Go to API Explorer →
+    </a>
+</div>
+
+<div class="card">
+    <h2>Activity Summary</h2>
+    <div style="display: flex; gap: 20px;">
+        <div style="flex: 1; padding: 20px; background: #e7f5ff; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2em; font-weight: bold; color: #007bff;">{{ customers_count }}</div>
+            <div style="color: #666;">Registered Customers</div>
+        </div>
+        <div style="flex: 1; padding: 20px; background: #ebfbee; border-radius: 8px; text-align: center;">
+            <div style="font-size: 2em; font-weight: bold; color: #2f9e44;">{{ kyc_count }}</div>
+            <div style="color: #666;">Verified KYC Logs</div>
+            <div style="flex: 1; padding: 20px; background: #fff4e6; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2em; font-weight: bold; color: #d9480f;">{{ tenant.enabled_features|length }}
+                </div>
+                <div style="color: #666;">Active Modules</div>
+            </div>
+        </div>
+        <div style="margin-top: 15px;">
+            <a href="{% url 'kyc_log_list' %}" style="color: #007bff; text-decoration: none; font-weight: bold;">View
+                all
+                activity →</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>API Configuration</h2>
+        <p>Use the following credentials to authenticate your API requests:</p>
+        <div style="background:#f8f9fa; padding:15px; border-radius:4px; border:1px solid #ddd;">
+            <strong>API Token:</strong><br>
+            <code>{{ tenant.api_token }}</code>
+        </div>
+    </div>
+    {% endblock %}

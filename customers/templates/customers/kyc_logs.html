@@ -1,0 +1,157 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}KYC Logs - {{ tenant.name }}{% endblock %}
+
+{% block brand %}{{ tenant.legal_name }}{% endblock %}
+
+{% block nav_items %}
+<a href="{% url 'tenant_dashboard' %}">Overview</a>
+<a href="{% url 'kyc_log_list' %}" class="active">KYC Logs</a>
+<a href="#">Users</a>
+<a href="{% url 'api_demo' %}">API Keys</a>
+{% endblock %}
+
+{% block page_title %}KYC Activity Logs{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">Verified Activity</h2>
+        <div>
+            <button onclick="document.getElementById('customerModal').style.display='block'" class="btn"
+                style="background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                + New Customer
+            </button>
+            <button onclick="document.getElementById('createModal').style.display='block'" class="btn"
+                style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                + New KYC Record
+            </button>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Document Type</th>
+                <th>Status</th>
+                <th>Date Shared</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td><code>#{{ log.id }}</code></td>
+                <td><strong>{{ log.customer.name }}</strong></td>
+                <td>{{ log.document_type }}</td>
+                <td><span class="badge badge-active">Verified</span></td>
+                <td>{{ log.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'kyc_log_detail' log.id %}" style="color: #007bff; text-decoration: none;">View
+                        Details</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
+                    No KYC activity logs found for this organization.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Simple Create Modal -->
+<div id="createModal"
+    style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+    <div
+        style="background: white; margin: 10% auto; padding: 30px; border-radius: 8px; width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <h2 style="margin-top: 0;">Create KYC Record</h2>
+        <form action="{% url 'kyc_log_create' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Customer</label>
+                <select name="customer_id" required
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    {% for customer in customers %}
+                    <option value="{{ customer.id }}">{{ customer.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Document Type</label>
+                <select name="document_type" required
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="Passport">Passport</option>
+                    <option value="National ID">National ID</option>
+                    <option value="Drivers License">Drivers License</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Document Image</label>
+                <input type="file" name="document_image" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px;">Notes</label>
+                <textarea name="notes" rows="3"
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+            </div>
+            <div style="text-align: right;">
+                <button type="button" onclick="document.getElementById('createModal').style.display='none'"
+                    style="padding: 10px 20px; background: #eee; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">Cancel</button>
+                <button type="submit"
+                    style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .badge-active {
+        background: #e6fcf5;
+        color: #0ca678;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        padding: 12px;
+        border-bottom: 2px solid #eee;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+</style>
+
+<!-- New Customer Modal -->
+<div id="customerModal"
+    style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+    <div
+        style="background: white; margin: 10% auto; padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <h2 style="margin-top: 0;">Add New Customer</h2>
+        <form action="{% url 'customer_create' %}" method="POST">
+            {% csrf_token %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px;">Customer Name</label>
+                <input type="text" name="name" required
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div style="text-align: right;">
+                <button type="button" onclick="document.getElementById('customerModal').style.display='none'"
+                    style="padding: 10px 20px; background: #eee; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">Cancel</button>
+                <button type="submit"
+                    style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -4,7 +4,6 @@ __pycache__/
 migrations
 settings_tenant.py
 settings_tenant.py/
-settings.py
 settings_tenant.py.example
 stacticcdn
 .idea/
@@ -40,7 +39,6 @@ migrate.sh
 .DS_Store
 manage.py
 manage.py/
-settings/
 setti# Django #
 *.log
 *.pot
@@ -188,7 +186,6 @@ accounts/migrations/*
 
 *.json
 *.sql
-core/settings.py
 scratchpad.py
 pagetoken.py
 
@@ -223,7 +220,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
-core/settings.py
 
 ### macOS Patch ###
 # iCloud generated files

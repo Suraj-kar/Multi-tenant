@@ -5,7 +5,7 @@ from django.contrib.auth import views as auth_views
 from core import views
 
 def public_home(request):
-    return HttpResponse("Public Schema Homepage")
+    return HttpResponse("Public Schema Homepage test")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
